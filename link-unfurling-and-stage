@@ -1,0 +1,134 @@
+---
+title: Tabs- Link unfurling
+author: Rajeshwari-v
+description: How to perform link unfurling with tab in a Microsoft Teams app.
+ms.topic: conceptual
+ms.author: Qianrwang
+---
+
+# Leverage link unfurling service for tabs
+
+The collaborative experience of Teams platform enhances with added new features continuously. A new UI component called **Stage View** is built in Teams allowing you to render the content that can be opened in full screen in Teams and pinned as a tab. 
+
+This documentation guides you on how to adopt the Stage View in your app.
+
+## What is Stage View
+
+Stage View is a giant, full screen UI component that you can invoke to surface your web content. We update the link-unfurling service and BotSDK so it can be used to turn URLs into a tab using an Adaptive card and Chat Service. When a user sends an URL in the chat or channel, we unfurl the URL to an Adaptive card, and get the UI and tab information via the card. When a user clicks the Adaptive card, it’s staged in the UI component. Users can pin the content as a tab directly from the Stage View.
+
+The diagram below shows how the Stage View works:
+
+Placeholder for the diagram
+
+## Why to adopt the Stage View
+
+The Stage View provides users with a more seamless experience of viewing content in Teams, instead of navigating to the browser. Users can interact directly with your content without leaving Teams and your app, leading to more engagement to your app and extending the time users spend on your app.
+
+## How to invoke the Stage View
+
+There’re two ways you can invoke the Stage View.
+
+### Invoke Stage View from Adaptive card
+
+Stage View can be invoked from an Adaptive card. When the user puts in a URL we will invoke to the bot and get back an adaptive card with the option to open it in a stage. Once a stage is launched, if the tabInfo was passed in then we will add the ability to pin the stage as a tab. The schema for the Adaptive card will be this:
+
+{
+      contentType: "application/vnd.microsoft.card.adaptive",
+      content: {
+        type: "AdaptiveCard",
+        version: "1.0",
+        body: [
+          {
+            type: "TextBlock",
+            size: "Medium",
+            weight: "Bolder",
+            text: "Publish Adaptive Card Schema"
+          },
+          {
+            type: "ColumnSet",
+            columns: [
+              {
+                type: "Column",
+                items: [
+                  {
+                    type: "TextBlock",
+                    weight: "Bolder",
+                    text: "Name",
+                    wrap: true
+                  },
+                  {
+                    type: "TextBlock",
+                    spacing: "None",
+                    text: "Created today",
+                    isSubtle: true,
+                    wrap: true
+                  }
+                ],
+                width: "stretch"
+              }
+            ]
+          },
+          {
+            type: "TextBlock",
+            text: "Description",
+            wrap: true
+          }
+        ],
+        actions: [
+          {
+            type: "Action.OpenUrl",
+            title: "Outside Teams",
+            url: contentUrl
+          },
+          {
+            type: "Action.Submit",
+            title: "View",
+            data: {
+              msteams: {
+                type: "invoke",
+                value: {
+                  type: "tab/tabInfoAction",
+                  tabInfo: {
+                    contentUrl: contentUrl,
+                    websiteUrl: websiteUrl,
+                    name: "Tasks",
+                    entityId: "entityId"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      preview: {
+        content: {
+          title: "Description",
+          text: "Task",
+          images: [
+            {
+              url: "https://taskmeow.com/static/media/logo.28c3e78f.svg"
+            }
+          ]
+        },
+        contentType: "application/vnd.microsoft.card.thumbnail"
+      }
+    }
+
+### Invoke Stage View through a deeplink
+You can also wrap the deep-link URL in our “microsoftTeams.executeDeeplink(url)” API to invoke the Stage View. Please follow the syntax below:
+
+https://teams.microsoft.com/l/stage/{appId}/0?context={“contentUrl”:”[contentUrl]”,“websiteUrl”:”[websiteUrl]”, “title”:”[title]”}
+
+We resolve the deeplink from our deeplinkservice and open the stage.Note that there’s no option to pin the tab when the Stage View is invoked from a deeplink.
+
+Here’re some examples:
+
+Example 1:
+
+https://teams.microsoft.com/l/stage/2a527703-1f6f-4559-a332-d8a7d288cd88/0?context={“contentUrl”:”https%3A%2F%2Fmicrosoft.sharepoint.com%2Fteams%2FLokisSandbox%2FSitePages%2FSandbox-Page.aspx”, “websiteURL”:”https%3A%2F%2Fmicrosoft.sharepoint.com%2Fteams%2FLokisSandbox%2FSitePages%2FSandbox-Page.aspx”, “title”:”Contoso”}
+
+Example 2:
+
+https://teams.microsoft.com/l/Meeting_Stage/2a527703-1f6f-4559-a332-d8a7d288cd88/0?context={“contentUrl”:”https%3A%2F%2Fmicrosoft.sharepoint.com%2Fteams%2FLokisSandbox%2FSitePages%2FSandbox-Page.aspx”, “websiteURL”:”https%3A%2F%2Fmicrosoft.sharepoint.com%2Fteams%2FLokisSandbox%2FSitePages%2FSandbox-Page.aspx”, “title”:”Contoso”}
+
+
