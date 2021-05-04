@@ -26,7 +26,7 @@ The following image explains how the Stage View works:
 
 ## Advantage of Stage View
 
-The Stage View provides users with a more seamless experience of viewing content in Teams, instead of browser. This leads to more engagement with your app within Teams.
+Stage View will help provide a more seamless experience of opening content in Teams. Users can open and view content provided by your app without leaving the context, they can pin the content to the chat or channel for future quick access. This will lead to a higher user engagement with your app.
 
 ##  Stage View vs. Task module
 
